@@ -9,6 +9,7 @@
             $this->setField(array("attr" => "photo",
                                   "type" => "file",
                                   "label" => __("Photo", "photo"),
+                                  "extra" => $this->get_cropper(),
                                   "note" => "<small>(Max. file size: ".ini_get('upload_max_filesize').")</small>"));
             if (isset($_GET['action']) and $_GET['action'] == "bookmarklet")
                 $this->setField(array("attr" => "from_url",
@@ -30,6 +31,7 @@
             $this->respondTo("filter_post", "filter_post");
             $this->respondTo("post_options", "add_option");
 
+   
             if (isset($_GET['url']) and
                 preg_match("/http:\/\/(www\.)?flickr\.com\/photos\/([^\/]+)\/([0-9]+)/", $_GET['url'])) {
                 $this->bookmarkletSelected();
@@ -110,6 +112,22 @@
         }
         public function excerpt($post) {
             return $post->caption;
+        }
+        public function get_cropper() {
+          $styles = Config::current()->chyrp_url."/feathers/photo/cropper/cropper.css";
+          $scripts = Config::current()->chyrp_url."/feathers/photo/cropper/jquery.cropper.js";
+          $init = Config::current()->chyrp_url."/feathers/photo/cropper/crop_init.js";
+
+          $crop = "\n\t".'<div class="avatar-wrapper"></div>';
+          $crop .= "\n\t".'<input name="x" type="text" value="" hidden>';
+          $crop .= "\n\t".'<input name="y" type="text" value="" hidden>';
+          $crop .= "\n\t".'<input name="h" type="text" value="" hidden>';
+          $crop .= "\n\t".'<input name="w" type="text" value="" hidden>';
+          $crop .= "\n\t".'<script src="'.$scripts.'"></script>';
+          $crop .= "\n\t".'<script src="'.$init.'"></script>';
+          $crop .= "\n\t".'<link  href="'.$styles.'" rel="stylesheet">';
+
+          return $crop;
         }
 
         public function feed_content($post) {
